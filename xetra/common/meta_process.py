@@ -10,4 +10,3 @@ class MetaProcess:
     @staticmethod
     def return_date_list():
         pass
-    

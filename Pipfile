@@ -7,6 +7,10 @@ name = "pypi"
 boto3 = "*"
 python-decouple = "*"
 black = "*"
+pyyaml = "*"
+pandas = "*"
+moto = "*"
+coverage = "*"
 
 [dev-packages]
 
