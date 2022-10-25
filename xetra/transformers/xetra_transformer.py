@@ -1,4 +1,9 @@
 from typing import NamedTuple
+
+import pandas as pd
+import pandas.core.frame
+
+from xetra.common.meta_process import MetaProcess
 from xetra.common.s3 import S3BucketConnector
 import logging
 
@@ -17,6 +22,7 @@ class XetraSourceConfig(NamedTuple):
     src_col_max_price: column name for maximum price in source
     src_col_traded_vol: column name for traded volume in source
     """
+
     src_first_extract_date: str
     src_columns: list
     src_col_date: str
@@ -44,6 +50,7 @@ class XetraTargetConfig(NamedTuple):
     trg_key_date_format: date format for target file key
     trg_format: file format of the target file
     """
+
     trg_col_isin: str
     trg_col_date: str
     trg_col_op_price: str
@@ -61,8 +68,16 @@ class XetraETL:
     """
     Reads the Xetra data, transforms and writes the transformed to target
     """
-    def __init__(self, s3_bucket_src: S3BucketConnector, s3_bucket_trg: S3BucketConnector, meta_key: str, src_args: XetraSourceConfig, trg_args: XetraTargetConfig):
-        """Contructor for XetraTransformer
+
+    def __init__(
+        self,
+        s3_bucket_src: S3BucketConnector,
+        s3_bucket_trg: S3BucketConnector,
+        meta_key: str,
+        src_args: XetraSourceConfig,
+        trg_args: XetraTargetConfig,
+    ):
+        """Constructor for XetraTransformer
 
         :param s3_bucket_src: connection to source S3 bucket
         :param s3_bucket_trg: connection to target S3 bucket
@@ -76,12 +91,38 @@ class XetraETL:
         self.meta_key = meta_key
         self.src_args = src_args
         self.trg_args = trg_args
-        self.extract_date =
-        self.extract_date_list =
-        self.meta_update_list =
+        (
+            self.extract_date,
+            self.extract_date_list,
+        ) = MetaProcess.return_date_list(
+            self.src_args.src_first_extract_date,
+            self.meta_key,
+            self.s3_bucket_trg,
+        )
+        self.meta_update_list = None
 
-    def extract(self):
-        pass
+    def extract(self) -> pandas.core.frame.DataFrame:
+        """
+        Read the source data and concatenates them to one Pandas DataFrame.
+
+        :return:
+            data_frame: Pandas DataFrame with the extracted data
+        """
+        self._logger.info("Extracting Xetra source files started...")
+        files = [
+            key
+            for date in self.extract_date_list
+            for key in self.s3_bucket_src.list_files_in_prefix(date)
+        ]
+        if not files:
+            data_frame = pd.DataFrame
+        else:
+            data_frame = pd.concat(
+                [self.s3_bucket_src.read_csv_to_df(file) for file in files],
+                ignore_index=True,
+            )
+        self._logger.info("Extracting Xetra source files finished.")
+        return data_frame
 
     def transform_report1(self):
         pass
