@@ -181,18 +181,22 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         """
         # Expected results
         return_exp = True
-        df_exp = pd.DataFrame([['A', 'B'], ['C', 'C']], columns=['col1', 'col2'])
-        key_exp = 'test.parquet'
+        df_exp = pd.DataFrame(
+            [["A", "B"], ["C", "C"]], columns=["col1", "col2"]
+        )
+        key_exp = "test.parquet"
         log_exp = f"Writing file to {self.s3_endpoint_url}/{self.s3_bucket_name}/{key_exp}"
         # Test init
-        file_format = 'parquet'
+        file_format = "parquet"
         # Method execution
         with self.assertLogs() as logm:
-            result = self.s3_bucket_conn.write_df_to_s3(df_exp, key_exp, file_format)
+            result = self.s3_bucket_conn.write_df_to_s3(
+                df_exp, key_exp, file_format
+            )
             # Log test after method execution
             self.assertIn(log_exp, logm.output[0])
         # Test after method execution
-        data = self.s3_bucket.Object(key=key_exp).get().get('Body').read()
+        data = self.s3_bucket.Object(key=key_exp).get().get("Body").read()
         out_buffer = BytesIO(data)
         df_result = pd.read_parquet(out_buffer)
         self.assertEqual(return_exp, result)
@@ -206,9 +210,11 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         if a not supported format is given as argument
         """
         # Expected results
-        df_exp = pd.DataFrame([['A', 'B'], ['C', 'D']], columns=['col1', 'col2'])
-        key_exp = 'test.parquet'
-        format_exp = 'wrong format'
+        df_exp = pd.DataFrame(
+            [["A", "B"], ["C", "D"]], columns=["col1", "col2"]
+        )
+        key_exp = "test.parquet"
+        format_exp = "wrong format"
         log_exp = f"The file format {format_exp} is not supported to be written to s3!"
         exception_exp = WrongFormatException
         # Method execution
