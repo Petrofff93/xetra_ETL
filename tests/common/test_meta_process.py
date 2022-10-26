@@ -30,9 +30,7 @@ class TestMetaProcessMethods(unittest.TestCase):
         self.s3_endpoint_url = "https://s3.eu-central-1.amazonaws.com"
         self.s3_bucket_name = "test_bucket"
         # Creating a bucket on the mocked s3
-        self.s3 = boto3.resource(
-            service_name="s3", endpoint_url=self.s3_endpoint_url
-        )
+        self.s3 = boto3.resource(service_name="s3", endpoint_url=self.s3_endpoint_url)
         self.s3.create_bucket(
             Bucket=self.s3_bucket_name,
             CreateBucketConfiguration={"LocationConstraint": "eu-central-1"},
@@ -67,16 +65,10 @@ class TestMetaProcessMethods(unittest.TestCase):
         # Test init
         meta_key = "meta.csv"
         # Method execution
-        MetaProcess.update_meta_file(
-            date_list_exp, meta_key, self.s3_bucket_meta
-        )
+        MetaProcess.update_meta_file(date_list_exp, meta_key, self.s3_bucket_meta)
         # Read meta file
         data = (
-            self.s3_bucket.Object(key=meta_key)
-            .get()
-            .get("Body")
-            .read()
-            .decode("utf-8")
+            self.s3_bucket.Object(key=meta_key).get().get("Body").read().decode("utf-8")
         )
         out_buffer = StringIO(data)
         df_meta_result = pd.read_csv(out_buffer)
@@ -137,16 +129,10 @@ class TestMetaProcessMethods(unittest.TestCase):
         )
         self.s3_bucket.put_object(Body=meta_content, Key=meta_key)
         # Method execution
-        MetaProcess.update_meta_file(
-            date_list_new, meta_key, self.s3_bucket_meta
-        )
+        MetaProcess.update_meta_file(date_list_new, meta_key, self.s3_bucket_meta)
         # Read meta file
         data = (
-            self.s3_bucket.Object(key=meta_key)
-            .get()
-            .get("Body")
-            .read()
-            .decode("utf-8")
+            self.s3_bucket.Object(key=meta_key).get().get("Body").read().decode("utf-8")
         )
         out_buffer = StringIO(data)
         df_meta_result = pd.read_csv(out_buffer)
@@ -184,9 +170,7 @@ class TestMetaProcessMethods(unittest.TestCase):
         self.s3_bucket.put_object(Body=meta_content, Key=meta_key)
         # Method execution
         with self.assertRaises(WrongMetaFileException):
-            MetaProcess.update_meta_file(
-                date_list_new, meta_key, self.s3_bucket_meta
-            )
+            MetaProcess.update_meta_file(date_list_new, meta_key, self.s3_bucket_meta)
         # Cleanup after test
         self.s3_bucket.delete_objects(Delete={"Objects": [{"Key": meta_key}]})
 
@@ -290,9 +274,7 @@ class TestMetaProcessMethods(unittest.TestCase):
         first_date = self.dates[1]
         # Method execution
         with self.assertRaises(KeyError):
-            MetaProcess.return_date_list(
-                first_date, meta_key, self.s3_bucket_meta
-            )
+            MetaProcess.return_date_list(first_date, meta_key, self.s3_bucket_meta)
         # Cleanup after test
         self.s3_bucket.delete_objects(Delete={"Objects": [{"Key": meta_key}]})
 

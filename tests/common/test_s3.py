@@ -28,9 +28,7 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         self.s3_endpoint_url = "https://s3.eu-central-1.amazonaws.com"
         self.s3_bucket_name = "test_bucket"
         # Creating a bucket on the mocked s3
-        self.s3 = boto3.resource(
-            service_name="s3", endpoint_url=self.s3_endpoint_url
-        )
+        self.s3 = boto3.resource(service_name="s3", endpoint_url=self.s3_endpoint_url)
         self.s3.create_bucket(
             Bucket=self.s3_bucket_name,
             CreateBucketConfiguration={"LocationConstraint": "eu-central-1"},
@@ -130,9 +128,7 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         file_format = "csv"
         # Method execution
         with self.assertLogs() as logm:
-            result = self.s3_bucket_conn.write_df_to_s3(
-                df_empty, key, file_format
-            )
+            result = self.s3_bucket_conn.write_df_to_s3(df_empty, key, file_format)
             # Log test after method execution
             self.assertIn(log_exp, logm.output[0])
         # Test after method execution
@@ -145,27 +141,21 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         """
         # Expected results
         return_exp = True
-        df_exp = pd.DataFrame(
-            [["A", "B"], ["C", "D"]], columns=["col1", "col2"]
-        )
+        df_exp = pd.DataFrame([["A", "B"], ["C", "D"]], columns=["col1", "col2"])
         key_exp = "test.csv"
-        log_exp = f"Writing file to {self.s3_endpoint_url}/{self.s3_bucket_name}/{key_exp}"
+        log_exp = (
+            f"Writing file to {self.s3_endpoint_url}/{self.s3_bucket_name}/{key_exp}"
+        )
         # Test init
         file_format = "csv"
         # Method execution
         with self.assertLogs() as logm:
-            result = self.s3_bucket_conn.write_df_to_s3(
-                df_exp, key_exp, file_format
-            )
+            result = self.s3_bucket_conn.write_df_to_s3(df_exp, key_exp, file_format)
             # Log test after method execution
             self.assertIn(log_exp, logm.output[0])
         # Test after method execution
         data = (
-            self.s3_bucket.Object(key=key_exp)
-            .get()
-            .get("Body")
-            .read()
-            .decode("utf-8")
+            self.s3_bucket.Object(key=key_exp).get().get("Body").read().decode("utf-8")
         )
         out_buffer = StringIO(data)
         df_result = pd.read_csv(out_buffer)
@@ -181,18 +171,16 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         """
         # Expected results
         return_exp = True
-        df_exp = pd.DataFrame(
-            [["A", "B"], ["C", "C"]], columns=["col1", "col2"]
-        )
+        df_exp = pd.DataFrame([["A", "B"], ["C", "C"]], columns=["col1", "col2"])
         key_exp = "test.parquet"
-        log_exp = f"Writing file to {self.s3_endpoint_url}/{self.s3_bucket_name}/{key_exp}"
+        log_exp = (
+            f"Writing file to {self.s3_endpoint_url}/{self.s3_bucket_name}/{key_exp}"
+        )
         # Test init
         file_format = "parquet"
         # Method execution
         with self.assertLogs() as logm:
-            result = self.s3_bucket_conn.write_df_to_s3(
-                df_exp, key_exp, file_format
-            )
+            result = self.s3_bucket_conn.write_df_to_s3(df_exp, key_exp, file_format)
             # Log test after method execution
             self.assertIn(log_exp, logm.output[0])
         # Test after method execution
@@ -210,9 +198,7 @@ class TestS3BucketConnectorMethods(unittest.TestCase):
         if a not supported format is given as argument
         """
         # Expected results
-        df_exp = pd.DataFrame(
-            [["A", "B"], ["C", "D"]], columns=["col1", "col2"]
-        )
+        df_exp = pd.DataFrame([["A", "B"], ["C", "D"]], columns=["col1", "col2"])
         key_exp = "test.parquet"
         format_exp = "wrong format"
         log_exp = f"The file format {format_exp} is not supported to be written to s3!"

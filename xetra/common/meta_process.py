@@ -34,13 +34,9 @@ class MetaProcess:
             ]
         )
         # Filling the date columns with extract_date_list
-        df_new[
-            MetaProcessFormat.META_SOURCE_DATE_COL.value
-        ] = extract_date_list
+        df_new[MetaProcessFormat.META_SOURCE_DATE_COL.value] = extract_date_list
         # Filling the processed column
-        df_new[
-            MetaProcessFormat.META_PROCESS_COL.value
-        ] = datetime.today().strftime(
+        df_new[MetaProcessFormat.META_PROCESS_COL.value] = datetime.today().strftime(
             MetaProcessFormat.META_PROCESS_DATE_FORMAT.value
         )
         try:
@@ -86,8 +82,7 @@ class MetaProcess:
             df_meta = s3_bucket_meta.read_csv_to_df(meta_key)
             # Creating set of all dates in meta file
             dates = [
-                start + timedelta(days=x)
-                for x in range(0, (today - start).days + 1)
+                start + timedelta(days=x) for x in range(0, (today - start).days + 1)
             ]
             # Creating set of all dates in meta file
             src_dates = set(

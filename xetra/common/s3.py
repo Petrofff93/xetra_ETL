@@ -34,9 +34,7 @@ class S3BucketConnector:
             aws_access_key_id=self.access_key,
             aws_secret_access_key=self.secret_key,
         )
-        self._s3 = self.session.resource(
-            service_name="s3", endpoint_url=endpoint_url
-        )
+        self._s3 = self.session.resource(service_name="s3", endpoint_url=endpoint_url)
         self._bucket = self._s3.Bucket(bucket)
 
     def list_files_in_prefix(self, prefix: str):
@@ -63,13 +61,7 @@ class S3BucketConnector:
         self._logger.info(
             "Reading file %s/%s/%s", self.end_point_url, self._bucket.name, key
         )
-        csv_obj = (
-            self._bucket.Object(key=key)
-            .get()
-            .get("Body")
-            .read()
-            .decode(encoding)
-        )
+        csv_obj = self._bucket.Object(key=key).get().get("Body").read().decode(encoding)
         data = StringIO(csv_obj)
         data_frame = pd.read_csv(data, sep=sep)
         return data_frame
@@ -88,9 +80,7 @@ class S3BucketConnector:
         :return:
         """
         if data_frame.empty:
-            self._logger.info(
-                "The dataframe is empty! No file will be written!"
-            )
+            self._logger.info("The dataframe is empty! No file will be written!")
             return None
 
         if file_format == S3FileTypes.CSV.value:
@@ -109,9 +99,7 @@ class S3BucketConnector:
         )
         raise WrongFormatException
 
-    def __put_object(
-        self, out_buffer: Union[StringIO, BytesIO], key: str
-    ) -> bool:
+    def __put_object(self, out_buffer: Union[StringIO, BytesIO], key: str) -> bool:
         """
         Helper function for self.write_df_to_s3()
 
